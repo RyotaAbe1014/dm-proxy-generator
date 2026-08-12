@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #182230;
+  --color-paper: #f8fafc;
+  --color-brand-50: #eef5ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-500: #3478f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --shadow-card: 0 16px 45px rgba(24, 34, 48, 0.06), 0 2px 8px rgba(24, 34, 48, 0.03);
+  --shadow-soft: 0 8px 24px rgba(24, 34, 48, 0.06);
+  --font-sans: Inter, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+}
+
+:root {
+  font-family: Inter, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  color: #182230;
+  background: #f8fafc;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
