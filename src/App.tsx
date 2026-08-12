@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { generateProxyPdf } from "@/lib/generate-proxy-pdf"
 
 type QueuedImage = {
   id: string
@@ -41,6 +42,8 @@ function App() {
   const [images, setImages] = useState<QueuedImage[]>([])
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [isExportingPdf, setIsExportingPdf] = useState(false)
+  const [pdfExportError, setPdfExportError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const objectUrlsRef = useRef<Set<string>>(new Set())
   const nextImageIdRef = useRef(1)
@@ -174,6 +177,22 @@ function App() {
         currentImage.id === imageId ? { ...currentImage, copies: nextCopies } : currentImage,
       ),
     )
+  }
+
+  const handleExportPdf = async () => {
+    if (isExportingPdf || totalCardFaces === 0) return
+
+    setIsExportingPdf(true)
+    setPdfExportError(null)
+
+    try {
+      await generateProxyPdf(images)
+    } catch (error) {
+      console.error("PDF export failed", error)
+      setPdfExportError("PDFの作成に失敗しました。画像を読み込めるか確認して、もう一度お試しください。")
+    } finally {
+      setIsExportingPdf(false)
+    }
   }
 
   return (
@@ -356,7 +375,7 @@ function App() {
               <CardFooter className="pt-2">
                 <div className="flex w-full items-start gap-2 rounded-xl bg-brand-50/70 p-3 text-[11px] leading-4 text-brand-700">
                   <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                  <span>印刷時は「実際のサイズ」を選択してください。</span>
+                  <span>印刷時は「実際のサイズ」または「100%」を選び、「ページに合わせる」などはオフにしてください。</span>
                 </div>
               </CardFooter>
             </Card>
@@ -370,16 +389,32 @@ function App() {
                   <div>
                     <p className="text-sm font-semibold">PDF を作成</p>
                     <p className="mt-1 text-xs leading-5 text-slate-400">
-                      {images.length > 0
-                        ? "次の工程で枚数を調整すると利用できます。"
+                      {totalCardFaces > 0
+                        ? "カードを実寸の A4 PDF に書き出せます。"
                         : "画像を 1 枚以上追加すると利用できます。"}
                     </p>
                   </div>
                 </div>
-                <Button disabled variant="secondary" size="lg" className="mt-5 w-full bg-white/10 text-slate-500">
-                  PDFを書き出す
+                <Button
+                  disabled={isExportingPdf || totalCardFaces === 0}
+                  variant="secondary"
+                  size="lg"
+                  className="mt-5 w-full bg-white text-slate-900 hover:bg-slate-100 disabled:bg-white/10 disabled:text-slate-500"
+                  onClick={handleExportPdf}
+                  aria-busy={isExportingPdf}
+                >
+                  {isExportingPdf ? "PDFを作成中…" : "PDFを書き出す"}
                   <ArrowUpRight className="h-4 w-4" />
                 </Button>
+                {isExportingPdf ? (
+                  <p className="mt-3 text-xs leading-5 text-slate-400" role="status" aria-live="polite">
+                    画像を読み込み、PDFを作成しています…
+                  </p>
+                ) : pdfExportError ? (
+                  <p className="mt-3 text-xs leading-5 text-rose-300" role="alert" aria-live="assertive">
+                    {pdfExportError}
+                  </p>
+                ) : null}
               </CardContent>
             </Card>
           </div>
