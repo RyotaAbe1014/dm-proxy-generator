@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useState } from "react"
 
 import { generateProxyPdf } from "@/lib/generate-proxy-pdf"
 import type { ProxyPdfQueueItem } from "@/lib/generate-proxy-pdf"
@@ -7,7 +7,7 @@ export function usePdfExport(images: ProxyPdfQueueItem[], totalCardFaces: number
   const [isExportingPdf, setIsExportingPdf] = useState(false)
   const [pdfExportError, setPdfExportError] = useState<string | null>(null)
 
-  const handleExportPdf = useCallback(async () => {
+  const handleExportPdf = async () => {
     if (isExportingPdf || totalCardFaces === 0) return
 
     setIsExportingPdf(true)
@@ -23,7 +23,7 @@ export function usePdfExport(images: ProxyPdfQueueItem[], totalCardFaces: number
     } finally {
       setIsExportingPdf(false)
     }
-  }, [images, isExportingPdf, totalCardFaces])
+  }
 
   return { isExportingPdf, pdfExportError, handleExportPdf }
 }
