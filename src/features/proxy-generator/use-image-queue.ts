@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import type { ChangeEvent, ClipboardEvent, DragEvent } from "react"
 
 import { MAX_CARD_FACES, MAX_IMAGE_COPIES, getTotalCardFaces } from "./constants"
@@ -10,21 +10,9 @@ export function useImageQueue() {
   const [images, setImages] = useState<QueuedImage[]>([])
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [isDragging, setIsDragging] = useState(false)
-  const objectUrlsRef = useRef<Set<string>>(new Set())
   const nextImageIdRef = useRef(1)
   const nextClipboardImageNumberRef = useRef(1)
   const totalCardFaces = getTotalCardFaces(images)
-
-  useEffect(() => {
-    const objectUrls = objectUrlsRef.current
-
-    return () => {
-      for (const url of objectUrls) {
-        URL.revokeObjectURL(url)
-      }
-      objectUrls.clear()
-    }
-  }, [])
 
   const addImageFiles = useCallback(
     (files: File[], source: ImageInputSource) => {
@@ -37,7 +25,6 @@ export function useImageQueue() {
       if (acceptedImageFiles.length > 0) {
         const newImages = acceptedImageFiles.map((file) => {
           const previewUrl = URL.createObjectURL(file)
-          objectUrlsRef.current.add(previewUrl)
 
           const fileName = file.name.trim()
           const name =
@@ -160,7 +147,6 @@ export function useImageQueue() {
       }
 
       if (nextCopies < 1) {
-        objectUrlsRef.current.delete(image.previewUrl)
         URL.revokeObjectURL(image.previewUrl)
         setImages((currentImages) =>
           currentImages.filter((currentImage) => currentImage.id !== imageId),
