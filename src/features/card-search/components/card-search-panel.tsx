@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react"
 import type { FormEvent, MouseEvent } from "react"
 import { ExternalLink, LoaderCircle, Plus, Search, X } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -127,7 +126,6 @@ export function CardSearchPanel({ totalCardFaces, onAddCard }: CardSearchPanelPr
                 <CardTitle id="card-search-heading" className="text-base">
                   公式カードを検索
                 </CardTitle>
-                <Badge variant="muted">試験的</Badge>
               </div>
               <CardDescription className="mt-1">
                 カード名で検索して、画像をそのまま一覧へ追加できます。
