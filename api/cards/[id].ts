@@ -1,7 +1,7 @@
 import {
   fetchOfficialCardDetail,
   getCardIdFromRequest,
-} from "../_lib/official-card-site.ts"
+} from "../_lib/official-card-site"
 
 const cacheHeaders = {
   "Cache-Control": "public, max-age=300, must-revalidate",
