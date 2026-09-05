@@ -1,4 +1,4 @@
-import { searchOfficialCards } from "../_lib/official-card-site.ts"
+import { searchOfficialCards } from "../_lib/official-card-site"
 
 const MAX_KEYWORD_LENGTH = 80
 
