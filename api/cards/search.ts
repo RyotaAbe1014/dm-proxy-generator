@@ -1,4 +1,4 @@
-import { searchOfficialCards } from "../_lib/official-card-site"
+import { searchOfficialCards } from "../_lib/official-card-site.js"
 
 const MAX_KEYWORD_LENGTH = 80
 
