@@ -1,4 +1,4 @@
-export type ImageInputSource = "file" | "clipboard"
+export type ImageInputSource = "file" | "clipboard" | "official-card"
 
 export type QueuedImage = {
   id: string

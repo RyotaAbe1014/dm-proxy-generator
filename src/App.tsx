@@ -6,6 +6,7 @@ import { ImageQueuePanel } from "./features/proxy-generator/components/image-que
 import { ImageUploadPanel } from "./features/proxy-generator/components/image-upload-panel"
 import { PdfExportCard } from "./features/proxy-generator/components/pdf-export-card/pdf-export-card"
 import { PrintSettingsCard } from "./features/proxy-generator/components/print-settings-card"
+import { CardSearchPanel } from "./features/card-search/components/card-search-panel"
 import { useImageQueue } from "./features/proxy-generator/use-image-queue"
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
     isDragging,
     totalCardFaces,
     handleFileChange,
+    handleAddCard,
     handleDragEnter,
     handleDragOver,
     handleDragLeave,
@@ -55,6 +57,8 @@ function App() {
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         />
+
+        <CardSearchPanel totalCardFaces={totalCardFaces} onAddCard={handleAddCard} />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_330px]">
           <ImageQueuePanel

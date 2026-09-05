@@ -1,10 +1,14 @@
 import { useRef, useState } from "react"
 import type { ChangeEvent, ClipboardEvent, DragEvent } from "react"
 
+import type { CardSearchResult } from "../card-search/types"
 import { MAX_CARD_FACES, MAX_IMAGE_COPIES, getTotalCardFaces } from "./constants"
 import type { Feedback, ImageInputSource, QueuedImage } from "./types"
 
 const isImageFile = (file: File) => file.type.toLowerCase().startsWith("image/")
+
+// カード名をブラウザのFile名として扱えるよう、ファイル名で問題になりやすい文字を置換します。
+const sanitizeFileName = (name: string) => name.replace(/[\\/:*?"<>|]/g, "_").trim()
 
 export function useImageQueue() {
   const [images, setImages] = useState<QueuedImage[]>([])
@@ -14,7 +18,7 @@ export function useImageQueue() {
   const nextClipboardImageNumberRef = useRef(1)
   const totalCardFaces = getTotalCardFaces(images)
 
-  const addImageFiles = (files: File[], source: ImageInputSource) => {
+  const addImageFiles = (files: File[], source: ImageInputSource): boolean => {
     const imageFiles = files.filter(isImageFile)
     const rejectedCount = files.length - imageFiles.length
     const availableCardFaces = MAX_CARD_FACES - totalCardFaces
@@ -30,7 +34,9 @@ export function useImageQueue() {
           fileName ||
           (source === "clipboard"
             ? `クリップボード画像 ${nextClipboardImageNumberRef.current++}`
-            : "名称未設定の画像")
+            : source === "official-card"
+              ? "公式カード画像"
+              : "名称未設定の画像")
 
         return {
           id: `image-${nextImageIdRef.current++}`,
@@ -69,11 +75,50 @@ export function useImageQueue() {
         message: `${acceptedImageFiles.length} 件の画像を追加しました。`,
       })
     }
+
+    return acceptedImageFiles.length > 0
   }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     addImageFiles(Array.from(event.target.files ?? []), "file")
     event.target.value = ""
+  }
+
+  const handleAddCard = async (card: CardSearchResult): Promise<boolean> => {
+    if (totalCardFaces >= MAX_CARD_FACES) {
+      setFeedback({
+        tone: "error",
+        message: `カード面の上限（${MAX_CARD_FACES}枚）に達しているため、画像を追加できません。枚数を減らすと追加できます。`,
+      })
+      return false
+    }
+
+    // 呼び出し元が成功メッセージを表示できるよう、取得・検証・キュー追加の成否を返します。
+    try {
+      const response = await fetch(`/api/cards/${encodeURIComponent(card.id)}/image`)
+      if (!response.ok) {
+        throw new Error("カード画像を取得できませんでした。")
+      }
+
+      const blob = await response.blob()
+      const type = response.headers.get("content-type")?.split(";", 1)[0] || blob.type
+
+      if (!type.toLowerCase().startsWith("image/")) {
+        throw new Error("取得したデータが画像ではありません。")
+      }
+
+      const fileName = sanitizeFileName(card.name) || card.id
+      const extension = type.split("/")[1] || "jpeg"
+      const imageFile = new File([blob], `${fileName}.${extension}`, { type })
+      return addImageFiles([imageFile], "official-card")
+    } catch (error) {
+      console.error("Official card image import failed", error)
+      setFeedback({
+        tone: "error",
+        message: "カード画像を取得できませんでした。時間をおいて再度お試しください。",
+      })
+      return false
+    }
   }
 
   const handleDragEnter = (event: DragEvent<HTMLElement>) => {
@@ -154,6 +199,7 @@ export function useImageQueue() {
     isDragging,
     totalCardFaces,
     handleFileChange,
+    handleAddCard,
     handleDragEnter,
     handleDragOver,
     handleDragLeave,
