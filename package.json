@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "typecheck": "tsc -b",
-    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b && tsc -p tsconfig.server.json --noEmit",
+    "build": "tsc -b && tsc -p tsconfig.server.json --noEmit && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "cheerio": "^1.2.0",
     "clsx": "^2.1.1",
     "jspdf": "^4.2.1",
     "lucide-react": "^1.31.0",
