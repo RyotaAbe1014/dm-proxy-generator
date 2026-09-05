@@ -1,4 +1,4 @@
-import { fetchOfficialCardImage, getCardIdFromRequest } from "../../_lib/official-card-site"
+import { fetchOfficialCardImage, getCardIdFromRequest } from "../../_lib/official-card-site.ts"
 
 const cacheHeaders = {
   "Cache-Control": "public, max-age=3600, must-revalidate",

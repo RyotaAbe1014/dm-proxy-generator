@@ -1,7 +1,7 @@
 import { load } from "cheerio"
 
-import { mapWithConcurrency } from "./concurrency"
-import { fetchWithTimeout } from "./fetch-with-timeout"
+import { mapWithConcurrency } from "./concurrency.ts"
+import { fetchWithTimeout } from "./fetch-with-timeout.ts"
 
 /**
  * デュエマ公式サイトとの通信・HTML解析をまとめたサーバー側アダプターです。
